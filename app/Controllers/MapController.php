@@ -2,33 +2,31 @@
 
 namespace App\Controllers;
 
+use App\Models\LocationModel;
+
 class MapController extends BaseController
 {
     public function index()
     {
-        $markers = $this->processData();
+        $locationModel = new LocationModel();
+        $locations = $locationModel->findAll();
+
+        $markers = $this->processData($locations);
         return view('map_view', ['markers' => json_encode($markers)]);
     }
 
-    private function processData()
+    private function processData($locations)
     {
-        $markers = [
-            [
-                'name' => 'Labersa, Balige',
-                'lat' => 2.3386506562408704,
-                'lon' => 99.0819425911695,
-                'type' => 'hotel',
-                'url' => 'https://labersatoba.com'
-            ],
-            // Add more markers here...
-        ];
-
-        // Add more locations from the PDF...
-        // Example:
-        // ['name' => 'Rose\'s Homestay', 'lat' => 2.3456, 'lon' => 99.1234, 'type' => 'homestay'],
-        // ['name' => 'RM. Sinar Minang', 'lat' => 2.3789, 'lon' => 99.2345, 'type' => 'restaurant'],
-        // ['name' => 'Museum TB. SIlalahi Center', 'lat' => 2.4012, 'lon' => 99.3456, 'type' => 'attraction'],
-
+        $markers = [];
+        foreach ($locations as $location) {
+            $markers[] = [
+                'title' => $location['title'],
+                'lat' => (float) $location['latitude'],
+                'lng' => (float) $location['longitude'],
+                'category' => $location['category'],
+                'url' => $location['url']
+            ];
+        }
         return $markers;
     }
 }
